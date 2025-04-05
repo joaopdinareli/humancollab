@@ -1,0 +1,19 @@
+{
+  "name": "humancollab",
+  "version": "0.0.1",
+  "description": "HumanCollab - Ferramenta para gestão de tarefas colaborativas",
+  "main": "main.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/joaopdinareli/humancollab.git"
+  },
+  "author": "João Pedro Basílio Dinareli",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/joaopdinareli/humancollab/issues"
+  },
+  "homepage": "https://github.com/joaopdinareli/humancollab#readme"
+}
