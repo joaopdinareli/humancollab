@@ -3,8 +3,29 @@ config:
   layout: elk
   theme: neutral
 ---
-%%{ init: { 'themeVariables': { 'fontSize': '12px', 'fontFamily': 'Arial' } } }%%
+%%{ init: { 'themeVariables': { 'fontSize': '14px', 'fontFamily': 'Arial' } } }%%
 classDiagram
+    class Status {
+        <<enumeration>>
+        ANDAMENTO
+        ATRASADO
+        CONCLUIDO_PRAZO
+        CONCLUIDO_ATRASO
+    }
+    class Urgencia{
+        <<enumeration>>
+        CRITICO
+        ALTO
+        MODERADO
+        BAIXO
+    }
+    class Visibilidade{
+        <<enumeration>>
+        PUBLICO
+        APENAS_EQUIPE
+        APENAS_GERENTE
+        PRIVADO
+    }
     class Usuario {
         <<abstract>>
         - nome: string
@@ -68,44 +89,21 @@ classDiagram
         - mensagem: string
         - data: Date
     }
-        class Status {
-        <<enumeration>>
-        ANDAMENTO
-        ATRASADO
-        CONCLUIDO_PRAZO
-        CONCLUIDO_ATRASO
-    }
-    class Urgencia{
-        <<enumeration>>
-        CRITICO
-        ALTO
-        MODERADO
-        BAIXO
-    }
-    class Visibilidade{
-        <<enumeration>>
-        PUBLICO
-        APENAS_EQUIPE
-        APENAS_GERENTE
-        PRIVADO
-    }
     Usuario <|-- Gerente
     Usuario <|-- Colaborador
-    Usuario "* membros" <--> "* equipes" Equipe
-    Usuario "1" *--> "1 dashboard" Dashboard
-    Gerente "1 gerente" <--> "* projetos" Projeto
-    Colaborador "* colaboradores" <--> "* tarefas" Tarefa
-    Tarefa "1 tarefa" <--> "* comentarios" Comentario
-    Tarefa "1" --> "* anexos" Anexo
-    Tarefa "1" --> "1 checklist" Checklist
-    Projeto "1" --> "* tarefas" Tarefa
-    Projeto "1" --> "* comentarios" Comentario
-    Projeto "1" --> "* anexos" Anexo
-    Projeto ..> Equipe
-    Equipe "1" ..> "1" Gerente
-    Equipe "1" o--> "* membros" Usuario
-    ConviteEquipe "1" ..> "1 usuario" Usuario
-    ConviteEquipe "1" ..> "1 equipe" Equipe
-    Comentario "*"..> "1 autor" Usuario
-    Checklist "1" *--> "* itens" ItemChecklist
-    Lembrete "1" ..> "1 tarefa" Tarefa
+    Usuario "*" -- "*" Equipe
+    Usuario "1" *-- "1" Dashboard
+    Colaborador "*" -- "*" Tarefa
+    Tarefa "1" -- "*" Anexo
+    Tarefa "1" -- "1" Checklist
+    Checklist "1" *-- "*" ItemChecklist
+    Projeto "1" -- "*" Tarefa
+    Projeto "1" -- "*" Anexo
+    Equipe "1" o-- "*" Usuario
+    Projeto ..> "*" Equipe
+    Equipe "*" ..> "1" Gerente
+    Comentario "*" ..> "1" Tarefa
+    Comentario "*" ..> "1" Usuario
+    ConviteEquipe "1" ..> "1" Usuario
+    ConviteEquipe "1" ..> "1" Equipe
+    Lembrete "1" ..> "1" Tarefa
