@@ -61,6 +61,8 @@ classDiagram
     class Equipe {
         - descricao: string
         + adicionaMembro(Usuario)
+        + removeMembro(Usuario)
+        + listarMembros()
     }
     class ConviteEquipe {
         - dataConvite: Date
@@ -69,7 +71,6 @@ classDiagram
     }
     class Comentario {
         - mensagem: string
-        - respostas: string[]
         - dataEnvio : Date
     }
     class Anexo {
@@ -91,7 +92,6 @@ classDiagram
     }
     Usuario <|-- Gerente
     Usuario <|-- Colaborador
-    Usuario "*" -- "*" Equipe
     Usuario "1" *-- "1" Dashboard
     Colaborador "*" -- "*" Tarefa
     Tarefa "1" -- "*" Anexo
@@ -99,11 +99,13 @@ classDiagram
     Checklist "1" *-- "*" ItemChecklist
     Projeto "1" -- "*" Tarefa
     Projeto "1" -- "*" Anexo
-    Equipe "1" o-- "*" Usuario
-    Projeto ..> "*" Equipe
+    Equipe "*" o-- "*" Usuario
+    Comentario "1" -- "*" Comentario
+    Comentario "*" .. "1" Tarefa
+    Projeto "*" ..> "*" Equipe
     Equipe "*" ..> "1" Gerente
-    Comentario "*" ..> "1" Tarefa
     Comentario "*" ..> "1" Usuario
     ConviteEquipe "1" ..> "1" Usuario
     ConviteEquipe "1" ..> "1" Equipe
     Lembrete "1" ..> "1" Tarefa
+    Lembrete "1" ..> "1" Usuario
