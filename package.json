@@ -15,5 +15,17 @@
   "bugs": {
     "url": "https://github.com/joaopdinareli/humancollab/issues"
   },
-  "homepage": "https://github.com/joaopdinareli/humancollab#readme"
+  "homepage": "https://github.com/joaopdinareli/humancollab#readme",
+  "dependencies": {
+    "@prisma/client": "^6.7.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.15.14",
+    "prisma": "^6.7.0",
+    "tsx": "^4.19.4",
+    "typescript": "^5.8.3"
+  },
+  "prisma": {
+    "seed": "npx tsx prisma/seed.ts"
+  }
 }

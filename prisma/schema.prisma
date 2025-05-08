@@ -1,0 +1,165 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Status {
+  ANDAMENTO
+  ATRASADO
+  CONCLUIDO_PRAZO
+  CONCLUIDO_ATRASO
+}
+
+enum Urgencia {
+  CRITICO
+  ALTO
+  MODERADO
+  BAIXO
+}
+
+enum Visibilidade {
+  PUBLICO
+  APENAS_EQUIPE
+  APENAS_GERENTE
+  PRIVADO
+}
+
+model Usuario {
+  id          Int             @id @default(autoincrement())
+  nome        String
+  empresa     String
+  email       String          @unique
+  cargo       String
+  tipo        String // "GERENTE" ou "COLABORADOR"
+  dashboard   Dashboard?
+  tarefas     Tarefa[]        @relation("TarefasUsuario")
+  comentarios Comentario[]
+  lembretes   Lembrete[]
+  convites    ConviteEquipe[]
+
+  equipes            Equipe[]      @relation("MembrosEquipe")
+  equipesGerenciadas Equipe[]      @relation("GerenteEquipe")
+  Gerente            Gerente[]
+  Colaborador        Colaborador[]
+}
+
+model Gerente {
+  id      Int     @id
+  usuario Usuario @relation(fields: [id], references: [id])
+}
+
+model Colaborador {
+  id      Int     @id
+  usuario Usuario @relation(fields: [id], references: [id])
+}
+
+model Dashboard {
+  id        Int     @id @default(autoincrement())
+  usuario   Usuario @relation(fields: [usuarioId], references: [id])
+  usuarioId Int     @unique
+}
+
+model Projeto {
+  id          Int      @id @default(autoincrement())
+  nome        String
+  descricao   String
+  dataCriacao DateTime
+  tarefas     Tarefa[]
+  anexos      Anexo[]
+  equipes     Equipe[]
+}
+
+model Tarefa {
+  id           Int          @id @default(autoincrement())
+  titulo       String
+  descricao    String
+  status       Status
+  urgencia     Urgencia
+  visibilidade Visibilidade
+  dataCriacao  DateTime
+  dataPrazo    DateTime
+
+  colaboradores Usuario[]    @relation("TarefasUsuario")
+  anexos        Anexo[]
+  checklist     Checklist?
+  comentarios   Comentario[]
+  lembretes     Lembrete[]
+  projetoId     Int
+  projeto       Projeto      @relation(fields: [projetoId], references: [id])
+}
+
+model Checklist {
+  id       Int             @id @default(autoincrement())
+  titulo   String
+  tarefa   Tarefa          @relation(fields: [tarefaId], references: [id])
+  tarefaId Int             @unique
+  itens    ItemChecklist[]
+}
+
+model ItemChecklist {
+  id          Int       @id @default(autoincrement())
+  descricao   String
+  concluido   Boolean
+  checklist   Checklist @relation(fields: [checklistId], references: [id])
+  checklistId Int
+}
+
+model Anexo {
+  id          Int      @id @default(autoincrement())
+  pathArquivo String
+  tarefa      Tarefa?  @relation(fields: [tarefaId], references: [id])
+  tarefaId    Int?
+  projeto     Projeto? @relation(fields: [projetoId], references: [id])
+  projetoId   Int?
+}
+
+model Comentario {
+  id        Int      @id @default(autoincrement())
+  mensagem  String
+  dataEnvio DateTime
+  tarefa    Tarefa   @relation(fields: [tarefaId], references: [id])
+  tarefaId  Int
+  usuario   Usuario  @relation(fields: [usuarioId], references: [id])
+  usuarioId Int
+}
+
+model Equipe {
+  id        Int             @id @default(autoincrement())
+  descricao String
+  membros   Usuario[]       @relation("MembrosEquipe")
+  gerenteId Int
+  gerente   Usuario         @relation("GerenteEquipe", fields: [gerenteId], references: [id])
+  projetos  Projeto[]
+  convites  ConviteEquipe[]
+}
+
+model ConviteEquipe {
+  id             Int      @id @default(autoincrement())
+  dataConvite    DateTime
+  dataVencimento DateTime
+  mensagem       String
+  usuarioId      Int
+  usuario        Usuario  @relation(fields: [usuarioId], references: [id])
+  equipeId       Int
+  equipe         Equipe   @relation(fields: [equipeId], references: [id])
+}
+
+model Lembrete {
+  id        Int      @id @default(autoincrement())
+  mensagem  String
+  data      DateTime
+  tarefaId  Int
+  tarefa    Tarefa   @relation(fields: [tarefaId], references: [id])
+  usuarioId Int
+  usuario   Usuario  @relation(fields: [usuarioId], references: [id])
+}
