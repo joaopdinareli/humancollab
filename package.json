@@ -4,7 +4,8 @@
   "description": "HumanCollab - Ferramenta para gestão de tarefas colaborativas",
   "main": "main.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "tsx watch src/server.ts"
   },
   "repository": {
     "type": "git",
@@ -17,10 +18,19 @@
   },
   "homepage": "https://github.com/joaopdinareli/humancollab#readme",
   "dependencies": {
-    "@prisma/client": "^6.7.0"
+    "@prisma/client": "^6.7.0",
+    "@types/express": "^5.0.1",
+    "argon2": "^0.43.0",
+    "jsonwebtoken": "^9.0.2",
+    "swagger-jsdoc": "^6.2.8",
+    "swagger-ui-express": "^5.0.1"
   },
   "devDependencies": {
+    "@types/argon2": "^0.14.1",
+    "@types/jsonwebtoken": "^9.0.9",
     "@types/node": "^22.15.14",
+    "@types/swagger-jsdoc": "^6.0.4",
+    "@types/swagger-ui-express": "^4.1.8",
     "prisma": "^6.7.0",
     "tsx": "^4.19.4",
     "typescript": "^5.8.3"

@@ -41,6 +41,7 @@ model Usuario {
   email       String          @unique
   cargo       String
   tipo        String // "GERENTE" ou "COLABORADOR"
+  senha       String
   dashboard   Dashboard?
   tarefas     Tarefa[]        @relation("TarefasUsuario")
   comentarios Comentario[]

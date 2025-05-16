@@ -139,3 +139,4 @@ generated
 nodes_modules
 volumes
 migrations
+.vscode
