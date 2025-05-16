@@ -36,12 +36,12 @@ enum Visibilidade {
 
 model Usuario {
   id          Int             @id @default(autoincrement())
+  email       String          @unique
+  senha       String
   nome        String
   empresa     String
-  email       String          @unique
   cargo       String
-  tipo        String // "GERENTE" ou "COLABORADOR"
-  senha       String
+  tipo        String
   dashboard   Dashboard?
   tarefas     Tarefa[]        @relation("TarefasUsuario")
   comentarios Comentario[]
@@ -136,6 +136,7 @@ model Comentario {
 
 model Equipe {
   id        Int             @id @default(autoincrement())
+  nome      String          @unique
   descricao String
   membros   Usuario[]       @relation("MembrosEquipe")
   gerenteId Int
@@ -150,9 +151,9 @@ model ConviteEquipe {
   dataVencimento DateTime
   mensagem       String
   usuarioId      Int
-  usuario        Usuario  @relation(fields: [usuarioId], references: [id])
+  usuario        Usuario  @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
   equipeId       Int
-  equipe         Equipe   @relation(fields: [equipeId], references: [id])
+  equipe         Equipe   @relation(fields: [equipeId], references: [id], onDelete: Cascade)
 }
 
 model Lembrete {

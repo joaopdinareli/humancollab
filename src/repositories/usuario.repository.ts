@@ -17,10 +17,10 @@ export const createUsuario = async (data: Omit<Usuario, 'id'>): Promise<Usuario>
   return prisma.usuario.create({ data });
 };
 
-export const updateUsuario = async (idUsuario: number, data: Partial<Usuario>): Promise<Usuario> => {
-  return prisma.usuario.update({ where: { id: idUsuario }, data });
+export const updateUsuario = async (email: string, data: Partial<Usuario>): Promise<Usuario> => {
+  return prisma.usuario.update({ where: { email }, data });
 };
 
-export const deleteUsuario = async (idUsuario: number): Promise<Usuario> => {
-  return prisma.usuario.delete({ where: { id: idUsuario } });
+export const deleteUsuario = async (email: string): Promise<Usuario> => {
+  return prisma.usuario.delete({ where: { email } });
 };

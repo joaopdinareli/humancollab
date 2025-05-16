@@ -8,6 +8,7 @@
  *     tags:
  *       - Autenticação
  *     summary: Realiza login e gera um token JWT
+ *     security: []
  *     requestBody:
  *       required: true
  *       content:
@@ -22,7 +23,7 @@
  *             schema:
  *               $ref: '#/components/schemas/LoginResponse'
  *       400:
- *         description: Dados inválidos (nome ou senha ausentes)
+ *         description: Dados inválidos (email ou senha ausentes)
  *       401:
  *         description: Usuário não encontrado ou senha inválida
  * components:
@@ -30,15 +31,15 @@
  *     LoginInput:
  *       type: object
  *       required:
- *         - nome
+ *         - email
  *         - senha
  *       properties:
- *         nome:
+ *         email:
  *           type: string
- *           example: Alice
+ *           example: alice@exemplo.com
  *         senha:
  *           type: string
- *           example: senha123
+ *           example: senhaAlice
  *     LoginResponse:
  *       type: object
  *       properties:

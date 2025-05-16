@@ -1,5 +1,6 @@
 import { Request, Response } from 'express';
 import * as usuarioRepository from '../repositories/usuario.repository';
+import * as argon2 from 'argon2';
 
 export const getAllUsuariosController = async (req: Request, res: Response) => {
   const usuarios = await usuarioRepository.getAllUsuarios();
@@ -28,18 +29,20 @@ export const getUsuarioByIdController = async (req: Request, res: Response) => {
 
 export const createUsuarioController = async (req: Request, res: Response) => {
   const { nome, empresa, email, cargo, tipo, senha } = req.body;
-  const newUsuario = await usuarioRepository.createUsuario({ nome, empresa, email, cargo, tipo, senha });
-  res.status(201).json(newUsuario);
+  const senhaCriptografada = await argon2.hash(senha);
+  const newUsuario = await usuarioRepository.createUsuario({ nome, empresa, email, cargo, tipo, senha: senhaCriptografada });
+  const { senha: _, ...usuarioSemSenha } = newUsuario;
+  res.status(201).json(usuarioSemSenha);
 };
 
 export const updateUsuarioController = async (req: Request, res: Response) => {
-  const id = parseInt(req.params.id);
-  const usuario = await usuarioRepository.updateUsuario(id, req.body);
+  const email = req.params.email;
+  const usuario = await usuarioRepository.updateUsuario(email, req.body);
   res.json(usuario);
 };
 
 export const deleteUsuarioController = async (req: Request, res: Response) => {
-  const id = parseInt(req.params.id);
-  await usuarioRepository.deleteUsuario(id);
+  const email = req.params.email;
+  await usuarioRepository.deleteUsuario(email);
   res.status(204).send();
 };

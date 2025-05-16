@@ -9,14 +9,40 @@ export const getEquipeById = async (idEquipe: number): Promise<Equipe | null> =>
   return prisma.equipe.findUnique({ where: { id: idEquipe }, include: { membros: true, gerente: true } });
 };
 
+export const getEquipesByUsuariosEmail = async (email: string): Promise<Equipe[]> => {
+  return prisma.equipe.findMany({
+    where: {
+      OR: [
+        {
+          membros: {
+            some: {
+              email: email
+            }
+          }
+        },
+        {
+          gerente: {
+            email: email
+          }
+        }
+      ]
+    },
+    include: { membros: true, gerente: true }
+  });
+};
+
+export const getEquipeByNome = async (nome: string): Promise<Equipe | null> => {
+  return prisma.equipe.findUnique({ where: { nome }, include: { membros: true, gerente: true } });
+};
+
 export const createEquipe = async (data: Omit<Equipe, 'idEquipe'>): Promise<Equipe> => {
   return prisma.equipe.create({ data });
 };
 
-export const updateEquipe = async (idEquipe: number, data: Partial<Equipe>): Promise<Equipe> => {
-  return prisma.equipe.update({ where: { id: idEquipe }, data });
+export const updateEquipe = async (nome: string, data: Partial<Equipe>): Promise<Equipe> => {
+  return prisma.equipe.update({ where: { nome }, data });
 };
 
-export const deleteEquipe = async (idEquipe: number): Promise<Equipe> => {
-  return prisma.equipe.delete({ where: { id: idEquipe } });
+export const deleteEquipe = async (nome: string): Promise<Equipe> => {
+  return prisma.equipe.delete({ where: { nome } });
 };

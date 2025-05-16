@@ -1,7 +1,13 @@
 import { PrismaClient } from '@prisma/client'
+import argon2 from 'argon2'
+
 const prisma = new PrismaClient()
 
 async function main() {
+   console.log('Iniciando o seed...')
+   const senhaHashAlice = await argon2.hash('senhaAlice');
+   const senhaHashBob = await argon2.hash('senhaBob');
+
    const usuario = await prisma.usuario.create({
       data: {
          nome: 'Alice',
@@ -9,10 +15,21 @@ async function main() {
          email: 'alice@exemplo.com',
          cargo: 'Engenheira',
          tipo: 'GERENTE',
+         senha: senhaHashAlice
       },
    })
 
-   // Add Alice to the Gerente table
+   const colaboradorUsuario = await prisma.usuario.create({
+      data: {
+         nome: 'Bob',
+         empresa: 'ExemploCorp',
+         email: 'bob@exemplo.com',
+         cargo: 'Desenvolvedor',
+         tipo: 'COLABORADOR',
+         senha: senhaHashBob
+      },
+   })
+
    await prisma.gerente.create({
       data: {
          id: usuario.id,
@@ -27,7 +44,8 @@ async function main() {
 
    const equipe = await prisma.equipe.create({
       data: {
-         descricao: 'Equipe A',
+         nome: 'Equipe A',
+         descricao: 'Equipe responsável pelo projeto X',
          gerenteId: usuario.id,
          membros: { connect: { id: usuario.id } },
       },
@@ -103,17 +121,6 @@ async function main() {
          data: new Date(Date.now() + 2 * 24 * 60 * 60 * 1000),
          tarefaId: tarefa.id,
          usuarioId: usuario.id,
-      },
-   })
-
-   // Create another Usuario and add to the Colaborador table
-   const colaboradorUsuario = await prisma.usuario.create({
-      data: {
-         nome: 'Bob',
-         empresa: 'ExemploCorp',
-         email: 'bob@exemplo.com',
-         cargo: 'Desenvolvedor',
-         tipo: 'COLABORADOR',
       },
    })
 

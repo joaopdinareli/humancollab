@@ -17,6 +17,20 @@ const swaggerOptions = {
       version: '1.0.0',
       description: 'API para gerenciamento colaborativo de projetos e equipes',
     },
+    components: {
+      securitySchemes: {
+        bearerAuth: {
+          type: 'http',
+          scheme: 'bearer',
+          bearerFormat: 'JWT',
+        },
+      },
+    },
+    security: [
+      {
+        bearerAuth: [],
+      },
+    ],
   },
   apis: ['./src/schemas/*.ts'],
 };

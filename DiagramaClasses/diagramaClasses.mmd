@@ -28,10 +28,13 @@ classDiagram
     }
     class Usuario {
         <<abstract>>
+        - id: int
         - nome: string
         - empresa: string
         - email: string
         - cargo: string
+        - senha: string
+        - tipo: string
         + comentar()
     }
     class Gerente {
@@ -43,6 +46,7 @@ classDiagram
         + concluirTarefa()
     }
     class Tarefa {
+        - id: int
         - titulo: string
         - descricao: string
         - status: Status
@@ -52,6 +56,7 @@ classDiagram
         - dataPrazo: Date
     }
     class Projeto {
+        - id: int
         - nome: string
         - descricao: string
         - dataCriacao: Date
@@ -59,37 +64,47 @@ classDiagram
         + listarMembros()
     }
     class Equipe {
+        - id: int
+        - nome: string
         - descricao: string
         + adicionaMembro(Usuario)
         + removeMembro(Usuario)
         + listarMembros()
     }
     class ConviteEquipe {
+        - id: int
         - dataConvite: Date
         - dataVencimento: Date
         - mensagem: string
     }
     class Comentario {
+        - id: int
         - mensagem: string
         - dataEnvio : Date
     }
     class Anexo {
+        - id: int
         - pathArquivo: string
     }
     class Checklist {
+        - id: int
         - titulo: string
     }
     class ItemChecklist {
+        - id: int
         - descricao: string
         - concluido: bool
     }
     class Dashboard {
+        - id: int
         + visualizarResumo()
     }
     class Lembrete {
+        - id: int
         - mensagem: string
         - data: Date
     }
+
     Usuario <|-- Gerente
     Usuario <|-- Colaborador
     Usuario "1" *-- "1" Dashboard
@@ -99,12 +114,12 @@ classDiagram
     Checklist "1" *-- "*" ItemChecklist
     Projeto "1" -- "*" Tarefa
     Projeto "1" -- "*" Anexo
-    Equipe "*" o-- "*" Usuario
-    Comentario "1" -- "*" Comentario
-    Comentario "*" .. "1" Tarefa
+    Equipe "*" o-- "*" Usuario : "membros"
+    Equipe "1" o-- "1" Gerente
     Projeto "*" ..> "*" Equipe
-    Equipe "*" ..> "1" Gerente
     Comentario "*" ..> "1" Usuario
+    Comentario "*" ..> "1" Tarefa
+    Comentario "1" -- "*" Comentario : "respostas"
     ConviteEquipe "1" ..> "1" Usuario
     ConviteEquipe "1" ..> "1" Equipe
     Lembrete "1" ..> "1" Tarefa
