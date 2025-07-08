@@ -7,7 +7,9 @@ async function main() {
    console.log('Iniciando o seed...')
    const senhaHashAlice = await argon2.hash('senhaAlice');
    const senhaHashBob = await argon2.hash('senhaBob');
-
+   // Usuários
+   const senhaHashCarlos = await argon2.hash('senhaCarlos');
+   const senhaHashDiana = await argon2.hash('senhaDiana');
    const usuario = await prisma.usuario.create({
       data: {
          nome: 'Alice',
@@ -30,6 +32,27 @@ async function main() {
       },
    })
 
+   const usuarioCarlos = await prisma.usuario.create({
+      data: {
+         nome: 'Carlos',
+         empresa: 'ExemploCorp',
+         email: 'carlos@exemplo.com',
+         cargo: 'Analista',
+         tipo: 'COLABORADOR',
+         senha: senhaHashCarlos
+      },
+   });
+   const usuarioDiana = await prisma.usuario.create({
+      data: {
+         nome: 'Diana',
+         empresa: 'ExemploCorp',
+         email: 'diana@exemplo.com',
+         cargo: 'Designer',
+         tipo: 'COLABORADOR',
+         senha: senhaHashDiana
+      },
+   });
+
    await prisma.gerente.create({
       data: {
          id: usuario.id,
@@ -50,6 +73,23 @@ async function main() {
          membros: { connect: { id: usuario.id } },
       },
    })
+
+   const equipeB = await prisma.equipe.create({
+      data: {
+         nome: 'Equipe B',
+         descricao: 'Equipe de suporte',
+         gerenteId: usuario.id,
+         membros: { connect: [{ id: usuario.id }, { id: colaboradorUsuario.id }, { id: usuarioCarlos.id }] },
+      },
+   });
+   const equipeC = await prisma.equipe.create({
+      data: {
+         nome: 'Equipe C',
+         descricao: 'Equipe de design',
+         gerenteId: usuario.id,
+         membros: { connect: [{ id: usuario.id }, { id: usuarioDiana.id }] },
+      },
+   });
 
    const projeto = await prisma.projeto.create({
       data: {
@@ -75,6 +115,33 @@ async function main() {
          },
       },
    })
+
+   await prisma.tarefa.create({
+      data: {
+         titulo: 'Revisar documentação',
+         descricao: 'Revisar docs do projeto',
+         status: 'ANDAMENTO',
+         urgencia: 'MODERADO',
+         visibilidade: 'PUBLICO',
+         dataCriacao: new Date(),
+         dataPrazo: new Date(Date.now() + 5 * 24 * 60 * 60 * 1000),
+         projetoId: projeto.id,
+         colaboradores: { connect: [{ id: colaboradorUsuario.id }, { id: usuarioCarlos.id }] },
+      },
+   });
+   await prisma.tarefa.create({
+      data: {
+         titulo: 'Criar protótipo',
+         descricao: 'Protótipo inicial do sistema',
+         status: 'ANDAMENTO',
+         urgencia: 'ALTO',
+         visibilidade: 'PUBLICO',
+         dataCriacao: new Date(),
+         dataPrazo: new Date(Date.now() + 10 * 24 * 60 * 60 * 1000),
+         projetoId: projeto.id,
+         colaboradores: { connect: [{ id: usuarioDiana.id }] },
+      },
+   });
 
    const checklist = await prisma.checklist.create({
       data: {

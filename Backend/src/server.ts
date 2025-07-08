@@ -4,10 +4,13 @@ import swaggerJsdoc from 'swagger-jsdoc';
 import usuarioRoutes from './routes/usuario.route';
 import equipeRoutes from './routes/equipe.route';
 import authRoutes from './routes/auth.route';
+import tarefaRoutes from './routes/tarefa.route';
+import cors from 'cors';
 import { authMiddleware } from './middlewares/auth.middleware';
 
 const app = express();
 app.use(express.json());
+app.use(cors());
 
 const swaggerOptions = {
   definition: {
@@ -38,9 +41,10 @@ const swaggerOptions = {
 const swaggerSpec = swaggerJsdoc(swaggerOptions);
 
 app.use('/docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
-app.use('/usuarios', authMiddleware, usuarioRoutes);
+app.use('/usuarios', usuarioRoutes); // Cadastro de usuário não exige auth
 app.use('/equipes', authMiddleware, equipeRoutes);
 app.use('/auth', authRoutes);
+app.use('/tarefas', authMiddleware, tarefaRoutes);
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {

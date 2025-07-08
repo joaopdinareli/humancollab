@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import HumanCollabLogo from './assets/logomarca.png';
 import Background from './assets/background.png';
 import {
@@ -10,9 +10,19 @@ import {
    Link,
    Alert
 } from '@mui/material';
+import { login, getToken } from './api';
+
+const API_URL = 'http://localhost:3000';
+
+// Adicionar tipos para as props de tema
+interface LoginPageProps {
+  mode: 'light' | 'dark';
+  setMode: React.Dispatch<React.SetStateAction<'light' | 'dark'>>;
+  onLogin: (token: string) => void;
+}
 
 // Componente principal da Página de Login
-export default function LoginPage() {
+export default function LoginPage({ mode, setMode, onLogin }: LoginPageProps) {
    // Estado para controlar se o formulário é de Login ou de Criação de Conta
    const [isLoginView, setIsLoginView] = useState(true);
 
@@ -26,18 +36,25 @@ export default function LoginPage() {
 
    // Estado para armazenar as mensagens de erro de validação
    const [errors, setErrors] = useState<any>({});
+   const [touched, setTouched] = useState<{[key:string]: boolean}>({});
 
    // Estado para exibir uma mensagem de sucesso após o envio
    const [successMessage, setSuccessMessage] = useState('');
+
+   // Estado para armazenar o token de autenticação
+   const [token, setToken] = useState<string | null>(null);
+
+   // Estado para exibir mensagens de erro da API
+   const [apiError, setApiError] = useState('');
 
    // Função para lidar com a mudança nos campos do formulário
    const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
       const { name, value } = e.target;
       setFormData(prevState => ({ ...prevState, [name]: value }));
-      // Limpa o erro do campo quando o usuário começa a digitar
       if (errors[name]) {
-         setErrors((prevErrors: any) => ({ ...prevErrors, [name]: null }));
+         setErrors((prevErrors: any) => ({ ...prevErrors, [name]: undefined }));
       }
+      setTouched(prev => ({ ...prev, [name]: true }));
    };
 
    // Função de validação dos campos do formulário
@@ -71,16 +88,59 @@ export default function LoginPage() {
    };
 
    // Função para lidar com o envio do formulário
-   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
       e.preventDefault();
       setSuccessMessage('');
+      setApiError('');
 
       if (validateForm()) {
-         console.log('Formulário válido, enviando dados:', formData);
-         const message = isLoginView ? 'Login realizado com sucesso!' : 'Conta criada com sucesso!';
-         setSuccessMessage(message);
-         // Limpa o formulário após o envio bem-sucedido
-         setFormData({ name: '', email: '', password: '', confirmPassword: '' });
+         if (isLoginView) {
+            try {
+               const resp = await login(formData.email, formData.password);
+               setToken(resp.token);
+               // Busca nome do usuário após login
+               if (resp.token) {
+                 const meResp = await fetch(`${API_URL}/auth/me`, {
+                   headers: { Authorization: `Bearer ${resp.token}` }
+                 });
+                 if (meResp.ok) {
+                   const meData = await meResp.json();
+                   if (meData && meData.nome) {
+                     localStorage.setItem('usuarioNome', meData.nome);
+                   }
+                 }
+               }
+               onLogin(resp.token); // Notifica o App
+               setSuccessMessage(resp.message);
+            } catch (err: any) {
+               setApiError('Login inválido.');
+            }
+         } else {
+            // Criação de conta
+            try {
+              const resp = await fetch(`${API_URL}/usuarios`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                  nome: formData.name,
+                  email: formData.email,
+                  senha: formData.password,
+                  tipo: 'usuario',
+                  empresa: '',
+                  cargo: ''
+                })
+              });
+              if (!resp.ok) {
+                const errData = await resp.json();
+                setApiError(errData.message || 'Erro ao criar conta.');
+                return;
+              }
+              setSuccessMessage('Conta criada com sucesso!');
+              setFormData({ name: '', email: '', password: '', confirmPassword: '' });
+            } catch (err) {
+              setApiError('Erro ao criar conta.');
+            }
+         }
       } else {
          console.log('Formulário inválido, verifique os erros.');
       }
@@ -90,9 +150,21 @@ export default function LoginPage() {
    const toggleView = () => {
       setIsLoginView(!isLoginView);
       setErrors({});
+      setTouched({});
       setSuccessMessage('');
       setFormData({ name: '', email: '', password: '', confirmPassword: '' });
    };
+
+   useEffect(() => {
+      const savedToken = getToken();
+      if (savedToken) {
+         setToken(savedToken);
+      }
+   }, []);
+
+   if (token) {
+      return null;
+   }
 
    return (
       <Box component="main" sx={{ 
@@ -133,6 +205,11 @@ export default function LoginPage() {
                         {successMessage}
                      </Alert>
                   )}
+                  {apiError && (
+                     <Alert severity="error" sx={{ mb: 2, borderRadius: '8px' }}>
+                        {apiError}
+                     </Alert>
+                  )}
 
                   {!isLoginView && (
                      <TextField
@@ -146,8 +223,8 @@ export default function LoginPage() {
                         autoComplete="name"
                         value={formData.name}
                         onChange={handleChange}
-                        error={!!errors.name}
-                        helperText={errors.name}
+                        error={Boolean(errors.name) && touched.name}
+                        helperText={touched.name ? errors.name : ''}
                      />
                   )}
 
@@ -162,8 +239,8 @@ export default function LoginPage() {
                      autoComplete="email"
                      value={formData.email}
                      onChange={handleChange}
-                     error={!!errors.email}
-                     helperText={errors.email}
+                     error={Boolean(errors.email) && touched.email}
+                     helperText={touched.email ? errors.email : ''}
                   />
 
                   <TextField
@@ -178,8 +255,8 @@ export default function LoginPage() {
                      autoComplete="current-password"
                      value={formData.password}
                      onChange={handleChange}
-                     error={!!errors.password}
-                     helperText={errors.password}
+                     error={Boolean(errors.password) && touched.password}
+                     helperText={touched.password ? errors.password : ''}
                   />
 
                   {!isLoginView && (
@@ -194,8 +271,8 @@ export default function LoginPage() {
                         id="confirmPassword"
                         value={formData.confirmPassword}
                         onChange={handleChange}
-                        error={!!errors.confirmPassword}
-                        helperText={errors.confirmPassword}
+                        error={Boolean(errors.confirmPassword) && touched.confirmPassword}
+                        helperText={touched.confirmPassword ? errors.confirmPassword : ''}
                      />
                   )}
 
