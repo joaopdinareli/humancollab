@@ -19,7 +19,6 @@ function App() {
     },
   }), [mode])
 
-  // Função para logout global
   const handleLogout = () => {
     localStorage.removeItem('token');
     setToken(null);

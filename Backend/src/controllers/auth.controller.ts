@@ -24,17 +24,15 @@ export const loginController = async (req: Request, res: Response): Promise<void
       process.env.JWT_SECRET || 'secret',
       { expiresIn: '1h' }
    );
-   res.json({ message: 'Login realizado com sucesso!', token });
+   res.json({ message: 'Login realizado com sucesso!', token, id: usuario.id });
 };
 
 export const meController = async (req: Request, res: Response): Promise<void> => {
-  // O middleware já decodificou o token e colocou em req.user
   const user = (req as any).user;
   if (!user || !user.email) {
     res.status(401).json({ message: 'Não autenticado' });
     return;
   }
-  // Busca o usuário no banco
   const usuario = await authRepository.findUsuarioByEmail(user.email);
   if (!usuario) {
     res.status(404).json({ message: 'Usuário não encontrado' });

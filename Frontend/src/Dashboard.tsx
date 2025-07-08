@@ -1,12 +1,12 @@
 import React, { useEffect, useState } from 'react';
 import { Box, Typography, List, ListItem, ListItemText, Avatar, Divider, ListItemIcon, Button, IconButton } from '@mui/material';
 import { getToken } from './api';
-import DashboardIcon from '@mui/icons-material/Dashboard';
 import AssignmentIcon from '@mui/icons-material/Assignment';
 import GroupIcon from '@mui/icons-material/Group';
 import SettingsIcon from '@mui/icons-material/Settings';
 import Brightness4Icon from '@mui/icons-material/Brightness4';
 import Brightness7Icon from '@mui/icons-material/Brightness7';
+import Listagem from './Tarefas';
 
 const API_URL = 'http://localhost:3000';
 
@@ -18,7 +18,7 @@ interface Usuario {
 interface Equipe {
   id: number;
   nome: string;
-  membros?: Usuario[]; // Adicionado para exibir membros
+  membros?: Usuario[];
 }
 
 interface Tarefa {
@@ -78,6 +78,7 @@ export default function Dashboard({ token, tipo, mode, setMode, onLogout }: Dash
   function handleLogout() {
     localStorage.removeItem('token');
     localStorage.removeItem('usuarioNome');
+    localStorage.removeItem('usuarioId');
     onLogout();
   }
 
@@ -106,9 +107,9 @@ export default function Dashboard({ token, tipo, mode, setMode, onLogout }: Dash
                 background: view === 'equipes'
                   ? (theme.palette.mode === 'dark' ? 'rgba(23,28,31,0.16)' : 'rgba(23,28,31,0.08)')
                   : theme.palette.background.default,
-                boxShadow: 'none',
                 border: 'none',
-                color: theme.palette.text.primary
+                boxShadow: 'none',
+                color: theme.palette.text.primary,
               })}
               onClick={() => setView('equipes')}
             >
@@ -218,7 +219,7 @@ export default function Dashboard({ token, tipo, mode, setMode, onLogout }: Dash
             {erro && <Typography color="error">{erro}</Typography>}
             <List>
               {equipes.map(equipe => (
-                <ListItem key={equipe.id} alignItems="flex-start">
+                <ListItem key={equipe.id} alignItems="flex-start" sx={{ mb: 2, borderRadius: 2, boxShadow: 1, bgcolor: 'background.paper', position: 'relative' }}>
                   <ListItemText
                     primary={equipe.nome}
                     secondary={
@@ -240,11 +241,14 @@ export default function Dashboard({ token, tipo, mode, setMode, onLogout }: Dash
           <>
             <Typography variant="h4" sx={{ mb: 2 }}>Tarefas</Typography>
             {erro && <Typography color="error">{erro}</Typography>}
-            <List>
-              {tarefas.map(tarefa => (
-                <ListItem key={tarefa.id}><ListItemText primary={tarefa.titulo} /></ListItem>
-              ))}
-            </List>
+            <Listagem tarefas={tarefas} onChange={() => {
+              fetch(`${API_URL}/tarefas`, {
+                headers: { Authorization: `Bearer ${token}` }
+              })
+                .then(r => r.ok ? r.json() : Promise.reject('Erro ao buscar tarefas'))
+                .then(setTarefas)
+                .catch(() => setErro('Erro ao buscar tarefas.'));
+            }} />
           </>
         )}
       </Box>

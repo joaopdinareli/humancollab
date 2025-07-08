@@ -7,7 +7,6 @@ async function main() {
    console.log('Iniciando o seed...')
    const senhaHashAlice = await argon2.hash('senhaAlice');
    const senhaHashBob = await argon2.hash('senhaBob');
-   // Usuários
    const senhaHashCarlos = await argon2.hash('senhaCarlos');
    const senhaHashDiana = await argon2.hash('senhaDiana');
    const usuario = await prisma.usuario.create({

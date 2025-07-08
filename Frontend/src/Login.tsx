@@ -14,7 +14,6 @@ import { login, getToken } from './api';
 
 const API_URL = 'http://localhost:3000';
 
-// Adicionar tipos para as props de tema
 interface LoginPageProps {
   mode: 'light' | 'dark';
   setMode: React.Dispatch<React.SetStateAction<'light' | 'dark'>>;
@@ -72,7 +71,7 @@ export default function LoginPage({ mode, setMode, onLogin }: LoginPageProps) {
       }
       if (!password) {
          newErrors.password = 'O campo de senha é obrigatório.';
-      } else if (password.length < 6) { // Verifica se a senha tem pelo menos 6 caracteres
+      } else if (password.length < 6) {
          newErrors.password = 'A senha deve ter no mínimo 6 caracteres.';
       }
       if (!isLoginView) {
@@ -87,7 +86,6 @@ export default function LoginPage({ mode, setMode, onLogin }: LoginPageProps) {
       return Object.keys(newErrors).length === 0;
    };
 
-   // Função para lidar com o envio do formulário
    const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
       e.preventDefault();
       setSuccessMessage('');
@@ -98,7 +96,9 @@ export default function LoginPage({ mode, setMode, onLogin }: LoginPageProps) {
             try {
                const resp = await login(formData.email, formData.password);
                setToken(resp.token);
-               // Busca nome do usuário após login
+               if (resp.id) {
+                 localStorage.setItem('usuarioId', resp.id.toString());
+               }
                if (resp.token) {
                  const meResp = await fetch(`${API_URL}/auth/me`, {
                    headers: { Authorization: `Bearer ${resp.token}` }
@@ -110,7 +110,7 @@ export default function LoginPage({ mode, setMode, onLogin }: LoginPageProps) {
                    }
                  }
                }
-               onLogin(resp.token); // Notifica o App
+               onLogin(resp.token);
                setSuccessMessage(resp.message);
             } catch (err: any) {
                setApiError('Login inválido.');
