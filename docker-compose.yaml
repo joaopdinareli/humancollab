@@ -1,11 +1,29 @@
+version: '3.8'
+
 services:
+  # Serviço para o aplicativo Next.js/Node.js
+  app:
+    build: .
+    ports:
+      - "3000:3000"
+    volumes:
+      - .:/app
+    depends_on:
+      - db
+    environment:
+      - DATABASE_URL=postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB}
+ 
+  # Serviço para o banco de dados PostgreSQL
   db:
     image: postgres:15.3
-    volumes:
-      - ./volumes/postgres/data:/var/lib/postgresql/data
-    environment:
-      POSTGRES_PASSWORD: test
-      POSTGRES_USER: test
-      POSTGRES_DB: humancollab
     ports:
       - "5432:5432"
+    environment:
+      - POSTGRES_DB=humancollab
+      - POSTGRES_USER=test
+      - POSTGRES_PASSWORD=test
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+
+volumes:
+  postgres-data:
