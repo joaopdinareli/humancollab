@@ -1,12 +1,8 @@
-import { Router } from 'express';
-import { getTarefas, postTarefa, putTarefa, deleteTarefa } from '../../../lib/controllers/tarefa.controller';
-import { authMiddleware } from '../../middleware';
+import { readTarefasController, createTarefaController } from '../../../lib/controllers/tarefa.controller';
+import { withAuth } from '../../../lib/withAuth';
 
-const router = Router();
+// GET /api/tarefa
+export const GET = withAuth(readTarefasController);
 
-router.get('/', authMiddleware, getTarefas);
-router.post('/', authMiddleware, postTarefa);
-router.put('/:id', authMiddleware, putTarefa);
-router.delete('/:id', authMiddleware, deleteTarefa);
-
-export default router;
+// POST /api/tarefa
+export const POST = withAuth(createTarefaController);

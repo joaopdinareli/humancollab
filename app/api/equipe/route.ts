@@ -1,18 +1,8 @@
-import { Router } from 'express';
-import { getAllEquipesController, getEquipeByIdController, 
-         getEquipesByUsuariosEmailController, getEquipeByNome,
-         createEquipeController, updateEquipeController, 
-         deleteEquipeController 
-       } from '../../../lib/controllers/equipe.controller';
+import { readAllEquipesController, createEquipeController } from '../../../lib/controllers/equipe.controller';
+import { withAuth } from '../../../lib/withAuth';
 
-const router = Router();
+// GET /api/equipe
+export const GET = withAuth(readAllEquipesController);
 
-router.get('/', getAllEquipesController);
-router.post('/', createEquipeController);
-router.get('/:id', getEquipeByIdController);
-router.get('/usuario/:email', getEquipesByUsuariosEmailController);
-router.get('/:nome', getEquipeByNome);
-router.put('/:nome', updateEquipeController);
-router.delete('/:nome', deleteEquipeController);
-
-export default router;
+// POST /api/equipe
+export const POST = withAuth(createEquipeController);

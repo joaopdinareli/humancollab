@@ -1,41 +1,45 @@
-import { Request, Response } from 'express';
-import { listarTarefas, criarTarefa, editarTarefa, deletarTarefa } from '../repositories/tarefa.repository';
+import { NextRequest, NextResponse } from 'next/server';
+import * as TarefaRepository from '../repositories/tarefa.repository';
 
-export const getTarefas = async (req: Request, res: Response) => {
+export const readTarefasController = async (req: NextRequest) => {
   try {
-    const tarefas = await listarTarefas();
-    res.json(tarefas);
+    const tarefas = await TarefaRepository.listarTarefas();
+    if (tarefas.length === 0) {
+      throw new Error ('Não há tarefas cadastradas.');
+    }
+    return NextResponse.json(tarefas, { status: 200 });
   } catch (error) {
-    res.status(500).json({ error: 'Erro ao buscar tarefas' });
+    return NextResponse.json({ error: 'Erro ao buscar tarefas.', details: error}, { status: 500});
   }
 };
 
-export const postTarefa = async (req: Request, res: Response) => {
+export const createTarefaController = async (req: NextRequest) => {
   try {
-    const tarefa = await criarTarefa(req.body);
-    res.status(201).json(tarefa);
+    const tarefa = await TarefaRepository.criarTarefa(req.body);
+    return NextResponse.json(tarefa, { status: 201 });
   } catch (error) {
-    console.error('Erro ao criar tarefa:', error);
-    res.status(500).json({ error: 'Erro ao criar tarefa', details: error });
+    return NextResponse.status(500).json({ error: 'Erro ao criar tarefa.', details: error }, { status: 500 });
   }
 };
 
-export const putTarefa = async (req: Request, res: Response) => {
+export const updateTarefaController = async (req: NextRequest, id: string) => {
   try {
-    const tarefa = await editarTarefa(Number(req.params.id), req.body);
-    res.json(tarefa);
+    const data = await req.json();
+    const tarefa = await TarefaRepository.editarTarefa(Number(id), data);
+    if (!tarefa) {
+      throw new Error ('Tarefa não encontrada.');
+    }
+    return NextResponse.json(tarefa, { status: 200 });
   } catch (error) {
-    console.error('Erro ao editar tarefa:', error);
-    res.status(500).json({ error: 'Erro ao editar tarefa', details: error });
+    return NextResponse.json({ error: 'Erro ao editar tarefa.', details: error }, { status: 500})
   }
 };
 
-export const deleteTarefa = async (req: Request, res: Response) => {
+export const deleteTarefaController = async (req: NextRequest, id: string) => {
   try {
-    await deletarTarefa(Number(req.params.id));
-    res.status(204).send();
+    await TarefaRepository.deletarTarefa(Number(id));
+    return NextResponse.json(null, { status: 204});
   } catch (error) {
-    console.error('Erro ao deletar tarefa:', error);
-    res.status(500).json({ error: 'Erro ao deletar tarefa', details: error });
+    return NextResponse.json({ error: 'Erro ao deletar tarefa.', details: error }, { status: 500})
   }
 };

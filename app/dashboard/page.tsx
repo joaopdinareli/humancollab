@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Box, Typography, List, ListItem, ListItemText, Avatar, Divider, ListItemIcon, Button, IconButton } from '@mui/material';
-import { getToken } from '../../../../Frontend/src/api';
+import { getToken } from '../../lib/auth';
 import AssignmentIcon from '@mui/icons-material/Assignment';
 import GroupIcon from '@mui/icons-material/Group';
 import SettingsIcon from '@mui/icons-material/Settings';

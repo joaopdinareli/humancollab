@@ -1,9 +1,11 @@
-import { Router } from 'express';
+import { NextRequest} from 'next/server';
 import { loginController, meController } from '../../../lib/controllers/auth.controller';
-import { authMiddleware } from '../../middleware';
+import { withAuth } from '../../../lib/withAuth';
 
-const router = Router();
+// POST /api/auth
+export async function POST(req: NextRequest) {
+  return loginController(req);
+}
 
-router.post('/login', loginController);
-router.get('/me', authMiddleware, meController);
-export default router;
+// GET /api/auth
+export const GET = withAuth(meController);

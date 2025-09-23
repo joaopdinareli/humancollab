@@ -1,42 +1,44 @@
-import { Request, Response } from 'express';
+import { NextRequest, NextResponse } from 'next/server';
 import jwt from 'jsonwebtoken';
 import argon2 from 'argon2';
 import * as authRepository from '../repositories/auth.repository';
 
-export const loginController = async (req: Request, res: Response): Promise<void> => {
-   const { email, senha } = req.body;
-   if (!email || !senha) {
-      res.status(400).json({ message: 'Email e senha são obrigatórios.' });
-      return;
-   }
-   const usuario = await authRepository.findUsuarioByEmail(email);
-   if (!usuario) {
-      res.status(401).json({ message: 'Usuário não encontrado.' });
-      return;
-   }
-   const senhaValida = await argon2.verify(usuario.senha, senha);
-   if (!senhaValida) {
-      res.status(401).json({ message: 'Senha inválida.' });
-      return;
-   }
-   const token = jwt.sign(
-      { email: usuario.email, tipo: usuario.tipo },
-      process.env.JWT_SECRET || 'secret',
-      { expiresIn: '1h' }
-   );
-   res.json({ message: 'Login realizado com sucesso!', token, id: usuario.id });
+export const loginController = async (req: NextRequest) => {
+  const { email, senha } = await req.json();
+  if (!email || !senha) {
+    return NextResponse.json({ message: 'Email e senha são obrigatórios.' }, { status: 400 });
+  }
+  const usuario = await authRepository.findUsuarioByEmail(email);
+  if (!usuario) {
+    return NextResponse.json({ message: 'Usuário não encontrado.' }, { status: 401 });
+  }
+  const senhaValida = await argon2.verify(usuario.senha, senha);
+  if (!senhaValida) {
+    return NextResponse.json({ message: 'Senha inválida.' }, { status: 401 });
+  }
+  const token = jwt.sign(
+    { email: usuario.email, tipo: usuario.tipo },
+    process.env.JWT_SECRET || 'secret',
+    { expiresIn: '1h' }
+  );
+  return NextResponse.json({ message: 'Login realizado com sucesso!', token, id: usuario.id });
 };
 
-export const meController = async (req: Request, res: Response): Promise<void> => {
-  const user = (req as any).user;
-  if (!user || !user.email) {
-    res.status(401).json({ message: 'Não autenticado' });
-    return;
+export const meController = async (req: NextRequest) => {
+  const authHeader = req.headers.get('authorization');
+  if (!authHeader) {
+    return NextResponse.json({ message: 'Não autenticado.' }, { status: 401 });
   }
-  const usuario = await authRepository.findUsuarioByEmail(user.email);
+  const token = authHeader.replace('Bearer ', '');
+  let decoded: any;
+  try {
+    decoded = jwt.verify(token, process.env.JWT_SECRET || 'secret');
+  } catch {
+    return NextResponse.json({ message: 'Token inválido.S' }, { status: 401 });
+  }
+  const usuario = await authRepository.findUsuarioByEmail(decoded.email);
   if (!usuario) {
-    res.status(404).json({ message: 'Usuário não encontrado' });
-    return;
+    return NextResponse.json({ message: 'Usuário não encontrado.' }, { status: 404 });
   }
-  res.json({ nome: usuario.nome, email: usuario.email });
+  return NextResponse.json({ nome: usuario.nome, email: usuario.email });
 };

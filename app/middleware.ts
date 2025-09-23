@@ -1,20 +1,17 @@
 import jwt from 'jsonwebtoken';
-import { Request, Response, NextFunction } from 'express';
+import { NextRequest } from 'next/server';
 
-export const authMiddleware = (req: Request, res: Response,
-   next: NextFunction): void => {
-   const authHeader = req.headers.authorization;
-   if (!authHeader) {
-      res.status(401).json({ message: 'Token ausente' });
-      return;
-   }
-   const token = authHeader.split(' ')[1];
-   try {
-      const decoded = jwt.verify(token, process.env.JWT_SECRET || 'secret');
-      (req as any).user = decoded;
-      next();
-   } catch {
-      res.status(401).json({ message: 'Token inválido' });
-      return;
-   }
+// Middleware adaptado para Next.js App Router
+export const authMiddleware = async (req: NextRequest): Promise<boolean> => {
+  const authHeader = req.headers.get('authorization');
+  if (!authHeader) {
+    return false;
+  }
+  const token = authHeader.split(' ')[1];
+  try {
+    jwt.verify(token, process.env.JWT_SECRET || 'secret');
+    return true;
+  } catch {
+    return false;
+  }
 };
