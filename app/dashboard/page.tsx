@@ -1,6 +1,7 @@
-import React, { useEffect, useState } from 'react';
+import * as React from 'react';
+import { useEffect, useState } from 'react';
 import { Box, Typography, List, ListItem, ListItemText, Avatar, Divider, ListItemIcon, Button, IconButton } from '@mui/material';
-import { getToken } from '../../lib/auth';
+import { getToken } from '../../lib/apiClient';
 import AssignmentIcon from '@mui/icons-material/Assignment';
 import GroupIcon from '@mui/icons-material/Group';
 import SettingsIcon from '@mui/icons-material/Settings';
@@ -183,7 +184,7 @@ export default function Dashboard({ token, tipo, mode, setMode, onLogout }: Dash
             </Button>
           </Box>
           <Box sx={{ display: 'flex', alignItems: 'center' }}>
-            <img src="/logomarca.png" alt="Logo" style={{ width: 32, height: 32 }} />
+            <img src="../../../public/logomarca.png" alt="Logo" style={{ width: 32, height: 32 }} />
             <Typography
               variant="h6"
               sx={theme => ({

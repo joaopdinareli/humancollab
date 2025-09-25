@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import HumanCollabLogo from './assets/logomarca.png';
-import Background from './assets/background.png';
+const HumanCollabLogo = '/logomarca.png';
+const Background = '/background.png';
 import {
    Container,
    Box,
@@ -10,7 +10,7 @@ import {
    Link,
    Alert
 } from '@mui/material';
-import { login, getToken } from '../../../../Frontend/src/api';
+import { login, getToken } from '../../lib/apiClient';
 
 const API_URL = 'http://localhost:3000';
 

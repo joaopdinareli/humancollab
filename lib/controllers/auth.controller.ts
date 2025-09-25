@@ -34,7 +34,7 @@ export const meController = async (req: NextRequest) => {
   try {
     decoded = jwt.verify(token, process.env.JWT_SECRET || 'secret');
   } catch {
-    return NextResponse.json({ message: 'Token inválido.S' }, { status: 401 });
+    return NextResponse.json({ message: 'Token inválido.' }, { status: 401 });
   }
   const usuario = await authRepository.findUsuarioByEmail(decoded.email);
   if (!usuario) {
