@@ -110,15 +110,12 @@
  *     responses:
  *       204:
  *         description: Usuário removido com sucesso
- */
-
-/**
- * @swagger
  * components:
  *   schemas:
  *     Usuario:
  *       type: object
  *       required:
+ *         - id
  *         - nome
  *         - empresa
  *         - email
