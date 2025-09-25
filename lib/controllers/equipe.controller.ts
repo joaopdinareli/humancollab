@@ -3,7 +3,7 @@ import * as equipeRepository from '../repositories/equipe.repository';
 
 export const readAllEquipesController = async (req: NextRequest) => {
   try {
-    const equipes = await equipeRepository.getAllEquipes();
+    const equipes = await equipeRepository.readAllEquipes();
     if (equipes.length === 0) {
       throw new Error ('Não há equipes cadastradas.');
     }
@@ -15,7 +15,7 @@ export const readAllEquipesController = async (req: NextRequest) => {
 
 export const readEquipeByIdController = async (req: NextRequest, id: string) => {
   try {
-    const equipe = await equipeRepository.getEquipeById(Number(id));
+    const equipe = await equipeRepository.readEquipeById(Number(id));
     if (!equipe) {
       throw new Error ('Não há uma equipe com esse ID.');
     }
@@ -27,7 +27,7 @@ export const readEquipeByIdController = async (req: NextRequest, id: string) => 
 
 export const readEquipesByUsuariosEmailController = async (req: NextRequest, email: string) => {
   try {
-    const equipes = await equipeRepository.getEquipesByUsuariosEmail(String(email));
+    const equipes = await equipeRepository.readEquipesByUsuariosEmail(String(email));
     if (equipes.length === 0) {
       throw new Error ('Não há equipes associadas a este usuário.');
     }
@@ -39,7 +39,7 @@ export const readEquipesByUsuariosEmailController = async (req: NextRequest, ema
 
 export const readEquipeByNomeController = async (req: NextRequest, nome: string) => {
   try {
-    const equipe = await equipeRepository.getEquipeByNome(String(nome));
+    const equipe = await equipeRepository.readEquipeByNome(String(nome));
     if (!equipe) {
       throw new Error ('Não há uma equipe com este nome.');
     }

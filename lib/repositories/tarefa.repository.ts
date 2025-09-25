@@ -2,7 +2,7 @@ import { PrismaClient } from '@prisma/client';
 
 const prisma = new PrismaClient();
 
-export const listarTarefas = async () => {
+export const readTarefas = async () => {
   return prisma.tarefa.findMany({
     include: {
       colaboradores: true,
@@ -15,7 +15,7 @@ export const listarTarefas = async () => {
   });
 };
 
-export const criarTarefa = async (data: any) => {
+export const createTarefa = async (data: any) => {
   const { colaboradorId, ...rest } = data;
   let dataToCreate = { ...rest };
   if (colaboradorId) {
@@ -27,11 +27,11 @@ export const criarTarefa = async (data: any) => {
   return prisma.tarefa.create({ data: dataToCreate });
 };
 
-export const editarTarefa = async (id: number, data: any) => {
+export const updateTarefa = async (id: number, data: any) => {
   return prisma.tarefa.update({ where: { id }, data });
 };
 
-export const deletarTarefa = async (id: number) => {
+export const deleteTarefa = async (id: number) => {
   await prisma.checklist.deleteMany({ where: { tarefaId: id } });
   await prisma.anexo.deleteMany({ where: { tarefaId: id } });
   await prisma.comentario.deleteMany({ where: { tarefaId: id } });

@@ -1,15 +1,15 @@
 import { PrismaClient, Usuario } from '@prisma/client';
 const prisma = new PrismaClient();
 
-export const getAllUsuarios = async (): Promise<Usuario[]> => {
+export const readAllUsuarios = async (): Promise<Usuario[]> => {
   return prisma.usuario.findMany();
 };
 
-export const getUsuarioByEmail = async (email: string): Promise<Usuario | null> => {
+export const readUsuarioByEmail = async (email: string): Promise<Usuario | null> => {
   return prisma.usuario.findUnique({ where: { email } });
 };
 
-export const getUsuarioById = async (idUsuario: number): Promise<Usuario | null> => {
+export const readUsuarioById = async (idUsuario: number): Promise<Usuario | null> => {
   return prisma.usuario.findUnique({ where: { id: idUsuario } });
 };
 

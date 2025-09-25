@@ -1,15 +1,15 @@
 import { PrismaClient, Equipe } from '@prisma/client';
 const prisma = new PrismaClient();
 
-export const getAllEquipes = async (): Promise<Equipe[]> => {
+export const readAllEquipes = async (): Promise<Equipe[]> => {
   return prisma.equipe.findMany({ include: { membros: true, gerente: true } });
 };
 
-export const getEquipeById = async (idEquipe: number): Promise<Equipe | null> => {
+export const readEquipeById = async (idEquipe: number): Promise<Equipe | null> => {
   return prisma.equipe.findUnique({ where: { id: idEquipe }, include: { membros: true, gerente: true } });
 };
 
-export const getEquipesByUsuariosEmail = async (email: string): Promise<Equipe[]> => {
+export const readEquipesByUsuariosEmail = async (email: string): Promise<Equipe[]> => {
   return prisma.equipe.findMany({
     where: {
       OR: [
@@ -31,7 +31,7 @@ export const getEquipesByUsuariosEmail = async (email: string): Promise<Equipe[]
   });
 };
 
-export const getEquipeByNome = async (nome: string): Promise<Equipe | null> => {
+export const readEquipeByNome = async (nome: string): Promise<Equipe | null> => {
   return prisma.equipe.findUnique({ where: { nome }, include: { membros: true, gerente: true } });
 };
 

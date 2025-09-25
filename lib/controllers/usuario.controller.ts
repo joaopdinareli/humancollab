@@ -4,7 +4,7 @@ import * as argon2 from 'argon2';
 
 export const readUsuariosController = async (req: NextRequest) => {
   try {
-    const usuarios = await usuarioRepository.getAllUsuarios();
+    const usuarios = await usuarioRepository.readAllUsuarios();
     if (usuarios.length === 0) {
       throw new Error ('Não há usuários cadastrados.');
     }
@@ -16,7 +16,7 @@ export const readUsuariosController = async (req: NextRequest) => {
 
 export const readUsuarioByEmailController = async (req: NextRequest, email: string) => {
   try {
-    const usuario = await usuarioRepository.getUsuarioByEmail(String(email));
+    const usuario = await usuarioRepository.readUsuarioByEmail(String(email));
     if (!usuario) {
       throw new Error('Não há um usuário com esse email.');
     }
@@ -47,7 +47,7 @@ export const deleteUsuarioController = async (req: NextRequest, email: string) =
 
 export const readUsuarioByIdController = async (req: NextRequest, id: string) => {
   try {
-    const usuario = await usuarioRepository.getUsuarioById(Number(id));
+    const usuario = await usuarioRepository.readUsuarioById(Number(id));
     if (!usuario) {
       throw new Error ('Não há um usuário com esse ID.');
     }
